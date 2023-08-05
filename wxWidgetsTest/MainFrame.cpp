@@ -1,4 +1,5 @@
 #include "MainFrame.h"
+#include "OptionsWindow.h"
 #include <wx/wx.h>
 
 
@@ -8,8 +9,8 @@ MainFrame::MainFrame(const wxString& title): wxFrame(nullptr, wxID_ANY, title)
 	
 	wxPanel* panel = new wxPanel(this);
 
-	wxButton* timeSelectButton = new wxButton(panel, wxID_ANY, "Time Select", wxDefaultPosition, wxDefaultSize); //opens options for reminder time
-	wxFont buttonFont(wxFontInfo(14)); 
+	wxButton* timeSelectButton = new wxButton(panel, wxID_ANY, "Reminder Settings", wxDefaultPosition, wxDefaultSize); //opens options for reminder time
+	wxFont buttonFont(wxFontInfo(12)); 
 	timeSelectButton->SetFont(buttonFont);
 
 	wxArrayString tempChoices;
@@ -58,7 +59,31 @@ MainFrame::MainFrame(const wxString& title): wxFrame(nullptr, wxID_ANY, title)
 
 void MainFrame::OnButtonClicked(wxCommandEvent& evt)
 {
-	wxLogStatus("Button Clicked");
+	if (!isOptionsWindowOpen)
+	{
+		optionsWindow = new OptionsWindow("Time Settings");
+		optionsWindow->Show(true);
+
+		// Set the flag to true since the OptionsWindow is now open.
+		isOptionsWindowOpen = true;
+
+		// Bind an event handler to catch when the OptionsWindow is closed.
+		optionsWindow->Bind(wxEVT_CLOSE_WINDOW, &MainFrame::OnOptionsWindowClosed, this);
+	}
+	else
+	{
+		
+		if (optionsWindow->IsIconized())
+			optionsWindow->Iconize(false);
+		optionsWindow->Raise();
+	}
+}
+
+void MainFrame::OnOptionsWindowClosed(wxCloseEvent& evt)
+{
+	// When the OptionsWindow is closed, reset the flag to false.
+	isOptionsWindowOpen = false;
+	evt.Skip(); // Allow the event to propagate
 }
 
 void MainFrame::OnDropDownSelect(wxCommandEvent& evt)
