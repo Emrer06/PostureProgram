@@ -7,6 +7,7 @@ public:
     OptionsWindow(const wxString& title);
     wxSpinCtrl* timeCtrl;
     wxRadioBox* radioBox;
+
     int GetReminderTime();
     bool GetRandomStatus();
 

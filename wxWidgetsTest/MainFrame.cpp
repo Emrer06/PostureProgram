@@ -31,8 +31,8 @@ MainFrame::MainFrame(const wxString& title): wxFrame(nullptr, wxID_ANY, title)
 	wxStaticBitmap* image = new wxStaticBitmap(panel, wxID_ANY, wxBitmap("volumeIcon2.png", wxBITMAP_TYPE_PNG), 
 		wxDefaultPosition, wxSize(50, 50)); //placed volumeIcon
 
-	wxButton* Start = new wxButton(panel, wxID_ANY, "Start", wxDefaultPosition, wxDefaultSize); //creates a button to start program
-	wxButton* Stop = new wxButton(panel, wxID_ANY, "Stop", wxDefaultPosition, wxDefaultSize); //creates a button to start program
+	Start = new wxButton(panel, wxID_ANY, "Start", wxDefaultPosition, wxDefaultSize); //creates a button to start program
+	Stop = new wxButton(panel, wxID_ANY, "Stop", wxDefaultPosition, wxDefaultSize); //creates a button to start program
 
 	Start->SetFont(buttonFont);
 	Stop->SetFont(buttonFont);
@@ -40,7 +40,8 @@ MainFrame::MainFrame(const wxString& title): wxFrame(nullptr, wxID_ANY, title)
 	timeSelectButton->Bind(wxEVT_BUTTON, &MainFrame::OnButtonClicked, this);
 	audioSlider->Bind(wxEVT_SLIDER, &MainFrame::OnSliderChanged, this);
 	dropDown->Bind(wxEVT_CHOICE, &MainFrame::OnDropDownSelect, this);       //Dynamic Event Handling for main menu elements
-
+	Start->Bind(wxEVT_BUTTON, &MainFrame::OnStartClicked, this);
+	Stop->Bind(wxEVT_BUTTON, &MainFrame::OnStopClicked, this);
 	// Create the horizontal sizer for the button and drop-down menu
 	wxBoxSizer* buttonDropDownSizer = new wxBoxSizer(wxHORIZONTAL);
 	buttonDropDownSizer->Add(timeSelectButton, 1, wxEXPAND | wxALL, 50); 
@@ -61,6 +62,19 @@ MainFrame::MainFrame(const wxString& title): wxFrame(nullptr, wxID_ANY, title)
 	panel->SetSizerAndFit(mainSizer);
 }
 
+void MainFrame::OnStartClicked(wxCommandEvent& evt)
+{
+	wxColour LightGreen(144, 238, 144);
+	Start->SetBackgroundColour(LightGreen);
+	Stop->SetBackgroundColour(wxNullColour); //sets stop back to default color
+}
+
+void MainFrame::OnStopClicked(wxCommandEvent& evt)
+{
+	wxColour LightRed(255, 71, 71);
+	Stop->SetBackgroundColour(LightRed);
+	Start->SetBackgroundColour(wxNullColour); //sets start back to the default color
+}
 
 void MainFrame::OnButtonClicked(wxCommandEvent& evt)
 {
