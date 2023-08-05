@@ -1,34 +1,43 @@
 #include "MainFrame.h"
-#include "OptionsWindow.h"
 #include <wx/wx.h>
 
 
 
-MainFrame::MainFrame(const wxString& title): wxFrame(nullptr, wxID_ANY, title)
+MainFrame::MainFrame(const wxString& title) : wxFrame(nullptr, wxID_ANY, title)
 {
-	
+
 	wxPanel* panel = new wxPanel(this);
 
-	wxButton* timeSelectButton = new wxButton(panel, wxID_ANY, "Reminder Settings", wxDefaultPosition, wxDefaultSize); //opens options for reminder time
-	wxFont buttonFont(wxFontInfo(12)); 
-	timeSelectButton->SetFont(buttonFont);
+	wxArrayString radioChoices;
+	radioChoices.Add("Random");
+	radioChoices.Add("Set Time (Min)");
+
+	radioBox = new wxRadioBox(panel, wxID_ANY, "Choose Reminder Type", wxDefaultPosition, wxDefaultSize, radioChoices);
+	radioBox->SetSelection(1);
+	timeCtrl = new wxSpinCtrl(panel, wxID_ANY, "30", wxDefaultPosition, wxSize(100, 20),
+		wxSP_ARROW_KEYS | wxSP_WRAP, 0, 60, 30);
+
+	wxFont buttonFont(wxFontInfo(15));
+	timeCtrl->SetFont(buttonFont);  //setting font of the timeCtrl
+
 
 	wxArrayString tempChoices;
 	tempChoices.Add("Default Audio");
 	tempChoices.Add("Temp A");
 	tempChoices.Add("Temp B");
 	tempChoices.Add("Temp C");
-	
+
 	wxChoice* dropDown = new wxChoice(panel, wxID_ANY, wxDefaultPosition, wxDefaultSize, tempChoices); //dropDown menu to select audio
 	dropDown->Select(0);
-	dropDown->SetFont(buttonFont);
+	wxFont buttonFont2(wxFontInfo(13));
+	dropDown->SetFont(buttonFont2);
 
 	wxSlider* audioSlider = new wxSlider(panel, wxID_ANY, 50, 0, 100, wxDefaultPosition,
 		wxDefaultSize, wxSL_VALUE_LABEL); //volume slider
 
 	wxPNGHandler* handler = new wxPNGHandler; //handler for png
-	wxImage::AddHandler(handler);						
-	wxStaticBitmap* image = new wxStaticBitmap(panel, wxID_ANY, wxBitmap("volumeIcon2.png", wxBITMAP_TYPE_PNG), 
+	wxImage::AddHandler(handler);
+	wxStaticBitmap* image = new wxStaticBitmap(panel, wxID_ANY, wxBitmap("volumeIcon2.png", wxBITMAP_TYPE_PNG),
 		wxDefaultPosition, wxSize(50, 50)); //placed volumeIcon
 
 	Start = new wxButton(panel, wxID_ANY, "Start", wxDefaultPosition, wxDefaultSize); //creates a button to start program
@@ -37,15 +46,19 @@ MainFrame::MainFrame(const wxString& title): wxFrame(nullptr, wxID_ANY, title)
 	Start->SetFont(buttonFont);
 	Stop->SetFont(buttonFont);
 
-	timeSelectButton->Bind(wxEVT_BUTTON, &MainFrame::OnButtonClicked, this);
+
 	audioSlider->Bind(wxEVT_SLIDER, &MainFrame::OnSliderChanged, this);
 	dropDown->Bind(wxEVT_CHOICE, &MainFrame::OnDropDownSelect, this);       //Dynamic Event Handling for main menu elements
 	Start->Bind(wxEVT_BUTTON, &MainFrame::OnStartClicked, this);
 	Stop->Bind(wxEVT_BUTTON, &MainFrame::OnStopClicked, this);
+	radioBox->Bind(wxEVT_RADIOBOX, &MainFrame::OnRadioSelect, this); //bind radioBox event handler
+	
+
 	// Create the horizontal sizer for the button and drop-down menu
 	wxBoxSizer* buttonDropDownSizer = new wxBoxSizer(wxHORIZONTAL);
-	buttonDropDownSizer->Add(timeSelectButton, 1, wxEXPAND | wxALL, 50); 
-	buttonDropDownSizer->Add(dropDown, 1, wxEXPAND | wxALL, 50); 
+	buttonDropDownSizer->Add(radioBox, 3, wxALIGN_LEFT | wxLEFT | wxTOP |wxBOTTOM | wxRIGHT , 20);
+	buttonDropDownSizer->Add(timeCtrl, 1, wxEXPAND |wxTOP | wxBOTTOM | wxRIGHT, 33);
+	buttonDropDownSizer->Add(dropDown, 0, wxEXPAND | wxALL, 30); 
 
 	// Create the horizontal sizer for the audio slider and image
 	wxBoxSizer* audioImageButtonSizer = new wxBoxSizer(wxHORIZONTAL);
@@ -76,35 +89,6 @@ void MainFrame::OnStopClicked(wxCommandEvent& evt)
 	Start->SetBackgroundColour(wxNullColour); //sets start back to the default color
 }
 
-void MainFrame::OnButtonClicked(wxCommandEvent& evt)
-{
-	if (!isOptionsWindowOpen)
-	{
-		optionsWindow = new OptionsWindow("Time Settings");
-		optionsWindow->Show(true);
-
-		// Set the flag to true since the OptionsWindow is now open.
-		isOptionsWindowOpen = true;
-
-		// Bind an event handler to catch when the OptionsWindow is closed.
-		optionsWindow->Bind(wxEVT_CLOSE_WINDOW, &MainFrame::OnOptionsWindowClosed, this);
-	}
-	else
-	{
-
-		if (optionsWindow->IsIconized())
-			optionsWindow->Iconize(false);
-		optionsWindow->Raise();                 //if the options menu is not in the forefront of the screen, clicking the button again will 
-	}											//bring it up without opening a new window
-}
-
-void MainFrame::OnOptionsWindowClosed(wxCloseEvent& evt)
-{
-	// When the OptionsWindow is closed, reset the flag to false.
-	isOptionsWindowOpen = false;
-	evt.Skip(); // Allow the event to propagate
-}
-
 void MainFrame::OnDropDownSelect(wxCommandEvent& evt)
 {
 	
@@ -117,3 +101,18 @@ void MainFrame::OnSliderChanged(wxCommandEvent& evt)
 	wxLogStatus(str);
 }
 
+void MainFrame::OnRadioSelect(wxCommandEvent& event)
+{
+	if (event.GetInt() == 0)
+	{
+		timeCtrl->Enable(false);
+		wxLogMessage("RANDOM SELECTED");
+		event.Skip();
+	}
+	else if (event.GetInt() == 1)
+	{
+		timeCtrl->Enable(true);
+		wxLogMessage("RANDOM NOT SELECTED");
+		event.Skip();
+	}
+}
