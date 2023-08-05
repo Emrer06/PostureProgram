@@ -77,11 +77,11 @@ void MainFrame::OnButtonClicked(wxCommandEvent& evt)
 	}
 	else
 	{
-		
+
 		if (optionsWindow->IsIconized())
 			optionsWindow->Iconize(false);
-		optionsWindow->Raise();
-	}
+		optionsWindow->Raise();                 //if the options menu is not in the forefront of the screen, clicking the button again will 
+	}											//bring it up without opening a new window
 }
 
 void MainFrame::OnOptionsWindowClosed(wxCloseEvent& evt)

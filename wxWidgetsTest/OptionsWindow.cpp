@@ -14,11 +14,11 @@ OptionsWindow::OptionsWindow(const wxString& title) : wxFrame(nullptr, wxID_ANY,
 		radioBox = new wxRadioBox(panel, wxID_ANY, "Choose Reminder Type", wxDefaultPosition, wxDefaultSize, radioChoices);
 		radioBox->SetSelection(1); 
 
-		timeCtrl = new wxSpinCtrl(panel, wxID_ANY, "Set Reminder (Min)", wxDefaultPosition, wxSize(200, -1),
+		timeCtrl = new wxSpinCtrl(panel, wxID_ANY, "Set Reminder (Min)", wxDefaultPosition, wxSize(200, 30),
 			wxSP_ARROW_KEYS | wxSP_WRAP, 0, 60, 30);
-		reminderTime = 30;
+		
 
-		wxFont buttonFont(wxFontInfo(8));
+		wxFont buttonFont(wxFontInfo(12));
 		timeCtrl->SetFont(buttonFont);  //setting font of the timeCtrl
 
 		wxButton* save = new wxButton(panel, wxID_ANY, "Save Settings", wxDefaultPosition, wxSize(100,40)); //opens options for reminder time
@@ -28,14 +28,14 @@ OptionsWindow::OptionsWindow(const wxString& title) : wxFrame(nullptr, wxID_ANY,
 
 		wxBoxSizer* horizontalSizer = new wxBoxSizer(wxHORIZONTAL);
 		horizontalSizer->Add(radioBox, 0, wxALIGN_CENTER_VERTICAL | wxALL, 20);
-		horizontalSizer->Add(timeCtrl, 1, wxALIGN_CENTER_VERTICAL | wxALL, 20);
+		horizontalSizer->Add(timeCtrl, 0, wxALIGN_CENTER_VERTICAL | wxALL, 20);
 
 		wxBoxSizer* buttonSizer = new wxBoxSizer(wxHORIZONTAL);
 		buttonSizer->Add(save, 0, wxALL, 10);
 
 		wxBoxSizer* mainSizer = new wxBoxSizer(wxVERTICAL);
 		mainSizer->Add(horizontalSizer, 1, wxALIGN_CENTER | wxTOP, 10);
-		mainSizer->Add(buttonSizer, 0, wxEXPAND | wxLEFT, 230);
+		mainSizer->Add(buttonSizer, 0, wxALIGN_CENTER, 0);
 		mainSizer->AddSpacer(30);
 
 		panel->SetSizerAndFit(mainSizer);
