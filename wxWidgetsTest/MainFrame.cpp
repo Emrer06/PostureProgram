@@ -1,9 +1,10 @@
 #include "MainFrame.h"
 #include <wx/wx.h>
+#include <wx/spinctrl.h>
 
 
 
-MainFrame::MainFrame(const wxString& title) : wxFrame(nullptr, wxID_ANY, title)
+MainFrame::MainFrame(const wxString& title) : wxFrame(nullptr, wxID_ANY, title) 
 {
 
 	wxPanel* panel = new wxPanel(this);
@@ -51,7 +52,9 @@ MainFrame::MainFrame(const wxString& title) : wxFrame(nullptr, wxID_ANY, title)
 	dropDown->Bind(wxEVT_CHOICE, &MainFrame::OnDropDownSelect, this);       //Dynamic Event Handling for main menu elements
 	Start->Bind(wxEVT_BUTTON, &MainFrame::OnStartClicked, this);
 	Stop->Bind(wxEVT_BUTTON, &MainFrame::OnStopClicked, this);
-	radioBox->Bind(wxEVT_RADIOBOX, &MainFrame::OnRadioSelect, this); //bind radioBox event handler
+	radioBox->Bind(wxEVT_RADIOBOX, &MainFrame::OnRadioSelect, this);       //bind radioBox event handler
+	timeCtrl->Bind(wxEVT_SPINCTRL, &MainFrame::OnSpinControl, this);
+
 	
 
 	// Create the horizontal sizer for the button and drop-down menu
@@ -69,11 +72,25 @@ MainFrame::MainFrame(const wxString& title) : wxFrame(nullptr, wxID_ANY, title)
 
 	// Create the final vertical sizer to hold both horizontal sizers
 	wxBoxSizer* mainSizer = new wxBoxSizer(wxVERTICAL);
-	mainSizer->Add(buttonDropDownSizer, 0, wxEXPAND | wxTOP, 20);
-	mainSizer->Add(audioImageButtonSizer, 0, wxEXPAND);
+	mainSizer->Add(buttonDropDownSizer, 0, wxEXPAND | wxTOP, 40);
+	mainSizer->Add(audioImageButtonSizer, 0, wxEXPAND |wxTOP | wxBOTTOM , 30);
 
 	panel->SetSizerAndFit(mainSizer);
+
+
+	timer = new wxTimer(this, wxID_ANY);
+	timer->Bind(wxEVT_TIMER, &MainFrame::OnTimer, this);
+	timer->Start(20000);
+
+
 }
+
+void MainFrame::OnTimer(wxTimerEvent& evt){
+	
+	wxLogMessage("Timer event occurred!");
+
+}
+
 
 void MainFrame::OnStartClicked(wxCommandEvent& evt)
 {
@@ -101,18 +118,49 @@ void MainFrame::OnSliderChanged(wxCommandEvent& evt)
 	wxLogStatus(str);
 }
 
-void MainFrame::OnRadioSelect(wxCommandEvent& event)
+void MainFrame::OnRadioSelect(wxCommandEvent& evt)
 {
-	if (event.GetInt() == 0)
+	int time = GetReminderTime();
+	if (evt.GetInt() == 0)
 	{
+		
 		timeCtrl->Enable(false);
-		wxLogMessage("RANDOM SELECTED");
-		event.Skip();
+		SetRandomStatus(true);
+		//wxLogMessage("RANDOM SELECTED");
+		evt.Skip();
 	}
-	else if (event.GetInt() == 1)
+	else if (evt.GetInt() == 1)
 	{
 		timeCtrl->Enable(true);
-		wxLogMessage("RANDOM NOT SELECTED");
-		event.Skip();
+		SetRandomStatus(false);
+		//wxLogMessage("RANDOM NOT SELECTED, time is set to %d ", time);
+		evt.Skip();
 	}
+}
+
+
+void MainFrame::OnSpinControl(wxCommandEvent& evt)
+{
+	SetReminderTime(evt.GetInt());
+	evt.Skip();
+}
+
+void MainFrame::SetReminderTime(int minutes)
+{
+	remindTime = minutes;
+}
+
+int MainFrame::GetReminderTime()
+{
+	return remindTime;
+}
+
+void MainFrame::SetRandomStatus(bool status)
+{
+	randStatus = status;
+}
+
+bool MainFrame::GetRandomStatus()
+{
+	return randStatus;
 }
