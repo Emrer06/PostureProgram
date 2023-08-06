@@ -18,7 +18,7 @@ MainFrame::MainFrame(const wxString& title) : wxFrame(nullptr, wxID_ANY, title)
 	radioChoices.Add("Random");
 	radioChoices.Add("Set Time (Min)");
 
-	radioBox = new wxRadioBox(panel, wxID_ANY, "Choose Reminder Type", wxDefaultPosition, wxDefaultSize, radioChoices);
+	radioBox = new wxRadioBox(panel, wxID_ANY, "Set Reminder Time Intervalsssssssssssssssssssssssss", wxDefaultPosition, wxDefaultSize, radioChoices);
 	radioBox->SetSelection(1);
 	timeCtrl = new wxSpinCtrl(panel, wxID_ANY, "30", wxDefaultPosition, wxSize(100, 20),
 		wxSP_ARROW_KEYS | wxSP_WRAP, 0, 60, 30);
@@ -144,11 +144,11 @@ void MainFrame::OnStartClicked(wxCommandEvent& evt)
 
 	if(GetRandomStatus())
 	{
-		timer->Start(2000); //gets a random number from 1 to 60 and multiplies by 60,000 to convert to milliseconds
+		timer->Start(GetRandomNumber(1, 60) * 60000); //gets a random number from 1 to 60 and multiplies by 60,000 to convert to milliseconds
 		
 	}else
 	{
-		timer->Start(4000);
+		timer->Start(GetReminderTime()*60000);
 	}
 }
 
