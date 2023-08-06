@@ -9,6 +9,12 @@
 
 MainFrame::MainFrame(const wxString& title) : wxFrame(nullptr, wxID_ANY, title) 
 {
+
+	// Load the icon file and set it as the window and taskbar icon
+	wxIcon icon("postureUpIcon.ico", wxBITMAP_TYPE_ICO);
+	SetIcon(icon);
+
+
 	int init = SDL_Init(SDL_INIT_EVERYTHING);
 	int init2 = Mix_Init(0);
 
@@ -18,7 +24,7 @@ MainFrame::MainFrame(const wxString& title) : wxFrame(nullptr, wxID_ANY, title)
 	radioChoices.Add("Random");
 	radioChoices.Add("Set Time (Min)");
 
-	radioBox = new wxRadioBox(panel, wxID_ANY, "Set Reminder Time Intervalsssssssssssssssssssssssss", wxDefaultPosition, wxDefaultSize, radioChoices);
+	radioBox = new wxRadioBox(panel, wxID_ANY, "Set Reminder Time Interval", wxDefaultPosition, wxDefaultSize, radioChoices);
 	radioBox->SetSelection(1);
 	timeCtrl = new wxSpinCtrl(panel, wxID_ANY, "30", wxDefaultPosition, wxSize(100, 20),
 		wxSP_ARROW_KEYS | wxSP_WRAP, 0, 60, 30);
@@ -38,7 +44,7 @@ MainFrame::MainFrame(const wxString& title) : wxFrame(nullptr, wxID_ANY, title)
 
 	dropDown = new wxChoice(panel, wxID_ANY, wxDefaultPosition, wxDefaultSize, tempChoices); //dropDown menu to select audio
 	dropDown->Select(1);
-	wxFont buttonFont2(wxFontInfo(13));
+	wxFont buttonFont2(wxFontInfo(11));
 	dropDown->SetFont(buttonFont2);
 
 	wxSlider* audioSlider = new wxSlider(panel, wxID_ANY, 50, 0, 100, wxDefaultPosition,
@@ -148,7 +154,7 @@ void MainFrame::OnStartClicked(wxCommandEvent& evt)
 		
 	}else
 	{
-		timer->Start(GetReminderTime()*60000);
+		timer->Start(5000);
 	}
 }
 
