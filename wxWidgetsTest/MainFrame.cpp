@@ -1,6 +1,5 @@
 #include "MainFrame.h"
-using namespace std;
-#include <iostream>
+
 #include <wx/wx.h>
 #include <wx/spinctrl.h>
 #include <random>
@@ -29,13 +28,16 @@ MainFrame::MainFrame(const wxString& title) : wxFrame(nullptr, wxID_ANY, title)
 
 
 	wxArrayString tempChoices;
+	tempChoices.Add("Random Voice");
 	tempChoices.Add("Default Audio");
-	tempChoices.Add("Temp A");
-	tempChoices.Add("Temp B");
-	tempChoices.Add("Temp C");
+	tempChoices.Add("A Wise Guy");
+	tempChoices.Add("Disappointed Grandfather");
+	tempChoices.Add("Motivational Man");
+	tempChoices.Add("Motivational Women");
+
 
 	dropDown = new wxChoice(panel, wxID_ANY, wxDefaultPosition, wxDefaultSize, tempChoices); //dropDown menu to select audio
-	dropDown->Select(0);
+	dropDown->Select(1);
 	wxFont buttonFont2(wxFontInfo(13));
 	dropDown->SetFont(buttonFont2);
 
@@ -86,22 +88,36 @@ MainFrame::MainFrame(const wxString& title) : wxFrame(nullptr, wxID_ANY, title)
 	timer = new wxTimer(this, wxID_ANY);
 	this->Connect(wxEVT_TIMER, wxTimerEventHandler(MainFrame::OnTimer), NULL, this);
 
-	
-
-	
-	
 }
 
 void MainFrame::OnTimer(wxTimerEvent& evt){
 
 	
+	std::vector<std::string> audioChoices = {
+			"", //choice 0 cannot be selection so it will be an empty string
+			"Default Audio.wav", // Placeholder for choice 1 (index 1) will correspond to tempChoices array
+			"PesciPosture2.wav",
+			"Disapointed Grandfather.wav",
+			"Motivational Man.wav",
+			"Motivational Women.wav"
+
+	};
+
+
+	int selection = GetChoice();
+	if (selection == 0) {
+		selection = GetRandomNumber(1, audioChoices.size() - 1);
+	}
+
+	std::string audioChoice = audioChoices[selection];
+
 	Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 1024);
-	Mix_Chunk* sound = Mix_LoadWAV("mixkit-achievement-bell-600.wav");
+	sound = Mix_LoadWAV(audioChoice.c_str()); //loads audiochoice as a string
 	if (!sound)
 	{
 
 		wxLogMessage(Mix_GetError());
-		
+
 	}
 	Mix_VolumeChunk(sound, volume);
 	Mix_PlayChannel(-1, sound, 0);
@@ -128,7 +144,7 @@ void MainFrame::OnStartClicked(wxCommandEvent& evt)
 
 	if(GetRandomStatus())
 	{
-		timer->Start(GetRandomNumber(1, 60) * 60000); //gets a random number from 1 to 60 and multiplies by 60,000 to convert to milliseconds
+		timer->Start(2000); //gets a random number from 1 to 60 and multiplies by 60,000 to convert to milliseconds
 		
 	}else
 	{
@@ -155,12 +171,13 @@ void MainFrame::OnStopClicked(wxCommandEvent& evt)
 	Stop->Enable(false);
 
 	timer->Stop();
+
+	Mix_VolumeChunk(sound, 0);
 }
 
 void MainFrame::OnDropDownSelect(wxCommandEvent& evt)
 {
-	
-	wxLogStatus(evt.GetString());
+	SetChoice(dropDown->GetSelection());
 }
 
 void MainFrame::OnSliderChanged(wxCommandEvent& evt)
@@ -234,6 +251,17 @@ bool MainFrame::GetSpinFlag()
 {
 	return spinOn;
 }
+
+void MainFrame::SetChoice(int choice)
+{
+	audioChoice = choice;
+}
+
+int MainFrame::GetChoice()
+{
+	return audioChoice;
+}
+
 
 MainFrame::~MainFrame()
 {

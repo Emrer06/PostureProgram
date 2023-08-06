@@ -1,7 +1,7 @@
 #pragma once
 #include <wx/wx.h>
 #include <wx/timer.h>
-
+#include <SDL2/SDL_mixer.h>
 
 class MainFrame : public wxFrame
 {
@@ -14,13 +14,14 @@ public:
 	wxRadioBox* radioBox;
 	wxChoice* dropDown;
 	wxTimer* timer;
-	
+	Mix_Chunk* sound;
 
 	int GetReminderTime();
     bool GetRandomStatus();
 	int GetRandomNumber(int min, int max);
 	bool GetSpinFlag();
-	int volume;
+	int GetChoice();
+	int volume = 50;
 
 private:
 	void OnSliderChanged(wxCommandEvent& evt);
@@ -34,8 +35,11 @@ private:
 	void SetRandomStatus(bool status);
 	void OnTimer(wxTimerEvent& evt);
 	void SetSpinFlag(bool spin);
+	void SetChoice(int choice);
+
 
 	int remindTime = 30;
+	int audioChoice = 1;
 	bool randStatus = false;
 	bool spinOn = true;
 
