@@ -154,7 +154,7 @@ void MainFrame::OnStartClicked(wxCommandEvent& evt)
 		
 	}else
 	{
-		timer->Start(5000);
+		timer->Start(GetReminderTime()*60000);
 	}
 }
 
