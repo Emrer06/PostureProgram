@@ -1,7 +1,7 @@
 #include "MainFrame.h"
 #include <wx/wx.h>
 #include <wx/spinctrl.h>
-
+#include <random>
 
 
 MainFrame::MainFrame(const wxString& title) : wxFrame(nullptr, wxID_ANY, title) 
@@ -28,7 +28,7 @@ MainFrame::MainFrame(const wxString& title) : wxFrame(nullptr, wxID_ANY, title)
 	tempChoices.Add("Temp B");
 	tempChoices.Add("Temp C");
 
-	wxChoice* dropDown = new wxChoice(panel, wxID_ANY, wxDefaultPosition, wxDefaultSize, tempChoices); //dropDown menu to select audio
+	dropDown = new wxChoice(panel, wxID_ANY, wxDefaultPosition, wxDefaultSize, tempChoices); //dropDown menu to select audio
 	dropDown->Select(0);
 	wxFont buttonFont2(wxFontInfo(13));
 	dropDown->SetFont(buttonFont2);
@@ -55,7 +55,6 @@ MainFrame::MainFrame(const wxString& title) : wxFrame(nullptr, wxID_ANY, title)
 	radioBox->Bind(wxEVT_RADIOBOX, &MainFrame::OnRadioSelect, this);       //bind radioBox event handler
 	timeCtrl->Bind(wxEVT_SPINCTRL, &MainFrame::OnSpinControl, this);
 
-	
 
 	// Create the horizontal sizer for the button and drop-down menu
 	wxBoxSizer* buttonDropDownSizer = new wxBoxSizer(wxHORIZONTAL);
@@ -74,20 +73,21 @@ MainFrame::MainFrame(const wxString& title) : wxFrame(nullptr, wxID_ANY, title)
 	wxBoxSizer* mainSizer = new wxBoxSizer(wxVERTICAL);
 	mainSizer->Add(buttonDropDownSizer, 0, wxEXPAND | wxTOP, 40);
 	mainSizer->Add(audioImageButtonSizer, 0, wxEXPAND |wxTOP | wxBOTTOM , 30);
-
+	
 	panel->SetSizerAndFit(mainSizer);
 
 
 	timer = new wxTimer(this, wxID_ANY);
-	timer->Bind(wxEVT_TIMER, &MainFrame::OnTimer, this);
-	timer->Start(20000);
+	this->Connect(wxEVT_TIMER, wxTimerEventHandler(MainFrame::OnTimer), NULL, this);
 
+	
 
+	
 }
 
 void MainFrame::OnTimer(wxTimerEvent& evt){
-	
-	wxLogMessage("Timer event occurred!");
+
+	sound->Play();
 
 }
 
@@ -97,6 +97,25 @@ void MainFrame::OnStartClicked(wxCommandEvent& evt)
 	wxColour LightGreen(144, 238, 144);
 	Start->SetBackgroundColour(LightGreen);
 	Stop->SetBackgroundColour(wxNullColour); //sets stop back to default color
+
+	if(GetSpinFlag() == true)
+	{
+		timeCtrl->Enable(false);
+	}							//checks if the timeCtrl is already disabled from the radiobox, if it isnt it turns it off when start is pressed
+
+	radioBox->Enable(false);
+	dropDown->Enable(false);
+	Start->Enable(false);
+	Stop->Enable(true);
+
+	if(GetRandomStatus())
+	{
+		timer->Start(GetRandomNumber(1, 60) * 60000); //gets a random number from 1 to 60 and multiplies by 60,000 to convert to milliseconds
+		
+	}else
+	{
+		timer->Start(4000);
+	}
 }
 
 void MainFrame::OnStopClicked(wxCommandEvent& evt)
@@ -104,6 +123,20 @@ void MainFrame::OnStopClicked(wxCommandEvent& evt)
 	wxColour LightRed(255, 71, 71);
 	Stop->SetBackgroundColour(LightRed);
 	Start->SetBackgroundColour(wxNullColour); //sets start back to the default color
+
+	if (GetSpinFlag() == true)
+	{
+		timeCtrl->Enable(true);
+	}			//checks if the timeCtrl is already disabled from the radiobox, if it isnt disabled due to radiobox
+	            //it turns it on when stop is pressed
+
+
+	radioBox->Enable(true);
+	dropDown->Enable(true);
+	Start->Enable(true);
+	Stop->Enable(false);
+
+	timer->Stop();
 }
 
 void MainFrame::OnDropDownSelect(wxCommandEvent& evt)
@@ -115,7 +148,9 @@ void MainFrame::OnDropDownSelect(wxCommandEvent& evt)
 void MainFrame::OnSliderChanged(wxCommandEvent& evt)
 {
 	wxString str = wxString::Format("Slider Value: %d", evt.GetInt());
-	wxLogStatus(str);
+	wxLogMessage(str);
+
+	evt.Skip();
 }
 
 void MainFrame::OnRadioSelect(wxCommandEvent& evt)
@@ -125,15 +160,17 @@ void MainFrame::OnRadioSelect(wxCommandEvent& evt)
 	{
 		
 		timeCtrl->Enable(false);
+		SetSpinFlag(false);
 		SetRandomStatus(true);
-		//wxLogMessage("RANDOM SELECTED");
+		
 		evt.Skip();
 	}
 	else if (evt.GetInt() == 1)
 	{
 		timeCtrl->Enable(true);
+		SetSpinFlag(true);
 		SetRandomStatus(false);
-		//wxLogMessage("RANDOM NOT SELECTED, time is set to %d ", time);
+		
 		evt.Skip();
 	}
 }
@@ -163,4 +200,21 @@ void MainFrame::SetRandomStatus(bool status)
 bool MainFrame::GetRandomStatus()
 {
 	return randStatus;
+}
+
+int MainFrame::GetRandomNumber(int min, int max) {
+	std::random_device rd;
+	std::mt19937 gen(rd());
+	std::uniform_int_distribution<> distribution(min, max);
+	return distribution(gen);
+}
+
+void MainFrame::SetSpinFlag(bool spin)
+{
+	spinOn = spin;
+}
+
+bool MainFrame::GetSpinFlag()
+{
+	return spinOn;
 }

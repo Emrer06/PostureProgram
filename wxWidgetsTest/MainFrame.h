@@ -1,6 +1,7 @@
 #pragma once
 #include <wx/wx.h>
 #include <wx/timer.h>
+#include <wx/mediactrl.h>
 
 class MainFrame : public wxFrame
 {
@@ -10,10 +11,14 @@ public:
 	wxButton* Stop;
 	wxSpinCtrl* timeCtrl;
 	wxRadioBox* radioBox;
+	wxChoice* dropDown;
 	wxTimer* timer;
+	wxMediaCtrl* sound;
+
 	int GetReminderTime();
     bool GetRandomStatus();
-
+	int GetRandomNumber(int min, int max);
+	bool GetSpinFlag();
 
 private:
 	void OnSliderChanged(wxCommandEvent& evt);
@@ -26,10 +31,11 @@ private:
 	void SetReminderTime(int minutes);
 	void SetRandomStatus(bool status);
 	void OnTimer(wxTimerEvent& evt);
-
+	void SetSpinFlag(bool spin);
 
 	int remindTime = 30;
 	bool randStatus = false;
+	bool spinOn = true;
 
 	
 };
