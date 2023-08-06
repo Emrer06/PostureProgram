@@ -30,4 +30,8 @@
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\..\..\Downloads\SDL2_mixer-2.6.3\lib\x64\SDL2_mixer.dll" />
+    <None Include="..\..\..\..\Downloads\SDL2-2.28.2\lib\x64\SDL2.dll" />
+  </ItemGroup>
 </Project>

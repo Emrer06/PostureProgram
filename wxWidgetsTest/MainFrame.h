@@ -1,24 +1,26 @@
 #pragma once
 #include <wx/wx.h>
 #include <wx/timer.h>
-#include <wx/mediactrl.h>
+
 
 class MainFrame : public wxFrame
 {
 public:
 	MainFrame(const wxString& title);
+	~MainFrame();
 	wxButton* Start;
 	wxButton* Stop;
 	wxSpinCtrl* timeCtrl;
 	wxRadioBox* radioBox;
 	wxChoice* dropDown;
 	wxTimer* timer;
-	wxMediaCtrl* sound;
+	
 
 	int GetReminderTime();
     bool GetRandomStatus();
 	int GetRandomNumber(int min, int max);
 	bool GetSpinFlag();
+	int volume;
 
 private:
 	void OnSliderChanged(wxCommandEvent& evt);

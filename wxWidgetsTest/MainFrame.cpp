@@ -1,11 +1,17 @@
 #include "MainFrame.h"
+using namespace std;
+#include <iostream>
 #include <wx/wx.h>
 #include <wx/spinctrl.h>
 #include <random>
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_mixer.h>
 
 
 MainFrame::MainFrame(const wxString& title) : wxFrame(nullptr, wxID_ANY, title) 
 {
+	int init = SDL_Init(SDL_INIT_EVERYTHING);
+	int init2 = Mix_Init(0);
 
 	wxPanel* panel = new wxPanel(this);
 
@@ -83,12 +89,22 @@ MainFrame::MainFrame(const wxString& title) : wxFrame(nullptr, wxID_ANY, title)
 	
 
 	
+	
 }
 
 void MainFrame::OnTimer(wxTimerEvent& evt){
 
-	sound->Play();
+	
+	Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 1024);
+	Mix_Chunk* sound = Mix_LoadWAV("mixkit-achievement-bell-600.wav");
+	if (!sound)
+	{
 
+		wxLogMessage(Mix_GetError());
+		
+	}
+	Mix_VolumeChunk(sound, volume);
+	Mix_PlayChannel(-1, sound, 0);
 }
 
 
@@ -97,6 +113,8 @@ void MainFrame::OnStartClicked(wxCommandEvent& evt)
 	wxColour LightGreen(144, 238, 144);
 	Start->SetBackgroundColour(LightGreen);
 	Stop->SetBackgroundColour(wxNullColour); //sets stop back to default color
+
+
 
 	if(GetSpinFlag() == true)
 	{
@@ -147,10 +165,8 @@ void MainFrame::OnDropDownSelect(wxCommandEvent& evt)
 
 void MainFrame::OnSliderChanged(wxCommandEvent& evt)
 {
-	wxString str = wxString::Format("Slider Value: %d", evt.GetInt());
-	wxLogMessage(str);
-
-	evt.Skip();
+	volume = (evt.GetInt() * 128) / 100; //the volume control method in SDL_mixer ranges to 128, so this normalizes the 0-100 range to a 0 to 128 range as accuracy in
+	evt.Skip();                          //this regard is not an issue for this program
 }
 
 void MainFrame::OnRadioSelect(wxCommandEvent& evt)
@@ -217,4 +233,10 @@ void MainFrame::SetSpinFlag(bool spin)
 bool MainFrame::GetSpinFlag()
 {
 	return spinOn;
+}
+
+MainFrame::~MainFrame()
+{
+	// Clean up SDL_mixer
+	Mix_CloseAudio();
 }
